@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Diving Volume in Millilitres Challenge</title>
+<style>
+:root{
+  --blue:#1683c7;
+  --deep:#0b5a90;
+  --sky:#eef9ff;
+  --ink:#22384d;
+  --good:#199a52;
+  --bad:#cf4c4c;
+  --p1:#438fe8;
+  --p2:#e95a55;
+  --gold:#d99b16;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;height:100%;overflow:hidden;
+  font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial,sans-serif;
+  background:linear-gradient(#edf8ff,#fff);
+  color:var(--ink)
+}
+body{padding:8px}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation}
+.app{
+  max-width:1280px;height:calc(100vh - 16px);margin:auto;
+  background:#fff;border:2px solid #cfe9fb;border-radius:24px;
+  overflow:hidden;box-shadow:0 12px 34px #4c8fb521;
+  display:flex;flex-direction:column
+}
+header{
+  flex:0 0 auto;background:var(--blue);color:#fff;padding:10px 16px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px
+}
+header h1{margin:0;font-size:clamp(22px,2.8vw,36px)}
+header .sub{font-size:12px;line-height:1.25;text-align:right}
+main{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column}
+.screen{display:none;height:100%;min-height:0}
+.screen.active{display:flex}
+.card{border:2px solid #d7edf9;border-radius:20px;background:#fff;box-shadow:0 7px 18px #4d8fb514}
+.hidden{display:none!important}
+
+/* HOME */
+#home{align-items:stretch}
+.homeGrid{flex:1;min-height:0;display:grid;grid-template-columns:1.05fr .95fr;gap:10px}
+.intro,.preview{padding:18px;overflow:hidden}
+.intro h2{margin:0;color:var(--deep);font-size:clamp(28px,4.4vw,52px);line-height:1.02}
+.intro p{font-size:clamp(15px,1.7vw,21px);line-height:1.42;margin:10px 0}
+.modeRow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.modeBtn{
+  border:0;border-radius:18px;color:#fff;padding:18px 10px;
+  font-size:clamp(20px,2.2vw,28px);font-weight:900;box-shadow:0 6px 0 #0002
+}
+.modeBtn.one{background:var(--p1)}
+.modeBtn.two{background:linear-gradient(90deg,var(--p1) 50%,var(--p2) 50%)}
+.modeBtn:active{transform:translateY(3px);box-shadow:0 3px 0 #0002}
+.diffWrap{margin-top:16px}
+.diffTitle{font-weight:900;color:var(--deep);font-size:clamp(16px,1.8vw,22px);margin-bottom:8px}
+.diffRow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.diffBtn{
+  border:2px solid #b9daf2;background:#fff;color:#1467a6;
+  border-radius:16px;padding:10px 8px;font-weight:900;font-size:clamp(15px,1.6vw,19px)
+}
+.diffBtn.active{background:#eaf6ff;border-color:#2889ce;box-shadow:0 0 0 3px #d8efff inset}
+.diffHint{font-size:12px;color:#6b7f90;line-height:1.35;margin-top:8px}
+.preview{background:linear-gradient(150deg,#fff,#eef9ff)}
+.preview h3{margin:0 0 8px;color:var(--deep);font-size:clamp(22px,2.4vw,30px)}
+.preview ul{font-size:clamp(14px,1.5vw,18px);line-height:1.5;margin:0 0 8px 20px;padding:0}
+.previewArt{
+  height:210px;border:2px solid #d7ecfa;border-radius:18px;background:#fff;
+  display:flex;align-items:center;justify-content:center;overflow:hidden
+}
+.note{font-size:12px;color:#6b7f90;text-align:center;margin-top:8px;line-height:1.3}
+
+/* GAME */
+#game{flex-direction:column;gap:7px}
+.controls{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.btnRow{display:flex;gap:8px;flex-wrap:wrap}
+.smallbtn{
+  border:0;background:#eaf6ff;color:#075f9f;border-radius:11px;padding:8px 12px;
+  font-weight:900;font-size:14px
+}
+.statusline{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.score{padding:8px 12px;border:2px solid #dceeff;border-radius:13px;background:#fff;font-weight:900}
+.score.p1{border-color:#b8d6ff}.score.p2{border-color:#ffc1bf;text-align:right}
+.round{font-weight:900;color:#5f7485;text-align:center}
+.progress{height:8px;background:#e9f3f9;border-radius:999px;overflow:hidden}
+.progress div{height:100%;background:var(--blue);width:0;transition:.25s}
+.gameGrid{
+  flex:1;min-height:0;
+  display:grid;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:8px
+}
+.questionCard{
+  min-height:0;padding:12px;display:flex;flex-direction:column;overflow:hidden
+}
+.badges{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{padding:6px 12px;border-radius:999px;font-weight:900;background:#eaf7ff;color:#0767aa}
+.turn.p1{background:#edf5ff;color:#3372bc;border:2px solid #bfd8ff}
+.turn.p2{background:#fff0ef;color:#b9413d;border:2px solid #ffc3c0}
+#question{
+  text-align:center;font-weight:900;font-size:clamp(20px,2.3vw,30px);line-height:1.15;
+  margin:8px 0
+}
+.measureWrap{
+  flex:1;min-height:0;border:2px solid #d9edfa;border-radius:18px;background:#fbfeff;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;padding:8px;overflow:hidden
+}
+.measureScene{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+}
+.helperBubble{
+  max-width:85%;background:#efeaff;border:2px solid #c8b8ee;color:#523f89;
+  border-radius:20px;padding:8px 14px;font-weight:900;font-size:clamp(12px,1.3vw,17px);
+  text-align:center;margin-bottom:4px;line-height:1.25
+}
+.answerWrap{
+  display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;
+  margin-top:8px;font-size:clamp(20px,2.4vw,28px);font-weight:900
+}
+.answerInput{
+  width:140px;height:50px;border:3px solid #b6d8f0;border-radius:14px;background:#fff;
+  text-align:center;font-weight:900;font-size:clamp(20px,2.3vw,28px);color:var(--ink)
+}
+.answerInput.correct{border-color:var(--good);background:#edf9f2;color:#08743a}
+.answerInput.wrong{border-color:var(--bad);background:#fff1f1;color:#b33030}
+.answerHint{text-align:center;font-size:14px;color:#6c7f90;margin-top:4px;min-height:18px}
+.actions{display:flex;justify-content:center;gap:10px;margin-top:8px}
+.action{
+  border:0;border-radius:13px;padding:9px 18px;background:var(--blue);color:#fff;
+  font-weight:900;font-size:18px
+}
+.action.alt{background:#6d80a6}
+.feedback{text-align:center;min-height:26px;font-weight:900;font-size:18px;margin-top:6px}
+.explain{text-align:center;min-height:30px;color:#637486;font-size:14px;line-height:1.35}
+
+/* diving */
+.diveCard{
+  min-height:0;padding:10px;display:flex;flex-direction:column;overflow:hidden;
+  background:linear-gradient(#fbfdff,#f4faff)
+}
+.diveTitle{
+  align-self:center;font-weight:900;font-size:clamp(18px,2vw,24px);
+  padding:6px 12px;border-radius:999px;background:#eaf7ff;color:#0c5c92
+}
+.diveStage{
+  flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+  border-radius:18px;overflow:hidden;background:#dff5ff;margin-top:8px
+}
+.diveSvg{width:100%;height:100%}
+.diveNote{text-align:center;font-weight:900;font-size:18px;min-height:26px;margin-top:6px;color:#5a6c7a}
+
+/* results */
+#results{align-items:center;justify-content:center}
+.results{width:min(680px,100%);padding:28px;text-align:center}
+.trophy{font-size:72px}
+.results h2{margin:0 0 10px;color:var(--deep);font-size:clamp(30px,4vw,50px)}
+.results p{font-size:clamp(18px,2vw,23px);line-height:1.45}
+.bigbtn{border:0;border-radius:14px;padding:12px 20px;margin:5px;background:var(--blue);color:#fff;font-size:19px;font-weight:900}
+.gold{background:#d99b16}
+
+.measureSvg{width:100%;height:100%}
+@media(max-width:980px){
+  .homeGrid{grid-template-columns:1fr}.preview{display:none}
+  .gameGrid{grid-template-columns:1fr;grid-template-rows:minmax(0,1.18fr) minmax(190px,.82fr)}
+}
+@media(max-width:700px){
+  body{padding:0}.app{height:100vh;border-radius:0}
+  header{padding:8px 12px}
+  main{padding:8px}
+  .answerInput{width:112px;height:44px}
+  .smallbtn{font-size:13px;padding:8px 10px}
+}
+@media(max-height:760px){
+  .questionCard,.diveCard{padding:8px}
+  #question{font-size:18px;margin:5px 0}
+  .helperBubble{font-size:12px;padding:6px 12px}
+  .answerInput{height:42px}
+  .feedback{font-size:16px;margin-top:4px}
+  .explain{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>🤿 Diving Volume in Millilitres Challenge</h1>
+  <div class="sub">Read volume in ml • jug • dispenser • syringe<br>1 Player or 2 Players • 3 Levels</div>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="homeGrid">
+    <div class="card intro">
+      <h2>Read the Volume. Make the Dive!</h2>
+      <p>Look at the measuring instruments and type the volume in <b>millilitres (ml)</b>. Choose a level and play in <b>1-player</b> or <b>2-player</b> mode.</p>
+
+      <div class="modeRow">
+        <button class="modeBtn one" onclick="startGame(1)">👤 1 Player</button>
+        <button class="modeBtn two" onclick="startGame(2)">👥 2 Players</button>
+      </div>
+
+      <div class="diffWrap">
+        <div class="diffTitle">Choose difficulty</div>
+        <div class="diffRow">
+          <button id="diffEasy" class="diffBtn active" onclick="setDifficulty('easy')">Easy</button>
+          <button id="diffIntermediate" class="diffBtn" onclick="setDifficulty('intermediate')">Intermediate</button>
+          <button id="diffHard" class="diffBtn" onclick="setDifficulty('hard')">Hard</button>
+        </div>
+        <div class="diffHint">
+          <b>Easy</b>: simple marked readings with helper hints.<br>
+          <b>Intermediate</b>: more markings and fewer labels.<br>
+          <b>Hard</b>: fewer hints and more careful reading.
+        </div>
+      </div>
+
+      <div class="note">
+        Correct answer: the diver makes a nice dive into the pool.<br>
+        Wrong answer: the diver flops with a splash.
+      </div>
+    </div>
+
+    <div class="card preview">
+      <h3>Question types</h3>
+      <ul>
+        <li>Find the volume of grape juice in a jug</li>
+        <li>Read the volume in a dispenser or measuring cylinder</li>
+        <li>Read the volume in a syringe</li>
+        <li>Different levels give simpler or trickier markings</li>
+      </ul>
+      <div class="previewArt" id="previewArt"></div>
+    </div>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div class="controls">
+    <div class="btnRow">
+      <button class="smallbtn" onclick="goHome()">← Home</button>
+      <button class="smallbtn" onclick="restart()">↻ New Game</button>
+      <button class="smallbtn" id="difficultyDisplay" onclick="goHome()">★ Easy</button>
+    </div>
+    <button class="smallbtn" id="soundBtn" onclick="toggleSound()">🔊 Sound On</button>
+  </div>
+
+  <div class="statusline">
+    <div class="score p1" id="score1">Player 1: 0</div>
+    <div class="round" id="round">1 / 12</div>
+    <div class="score p2" id="score2">Player 2: 0</div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
+
+  <div class="gameGrid">
+    <div class="card questionCard">
+      <div class="badges">
+        <div class="badge" id="typeBadge">Jug</div>
+        <div class="badge" id="levelBadge">Easy</div>
+        <div class="badge turn p1" id="turnBanner">👤 Your Turn</div>
+      </div>
+
+      <div id="question">What is the volume of grape juice in the jug?</div>
+
+      <div class="measureWrap">
+        <div class="helperBubble" id="helperBubble">Helper note here.</div>
+        <div class="measureScene" id="measureScene"></div>
+      </div>
+
+      <div class="answerWrap">
+        <input id="answerInput" class="answerInput" inputmode="numeric" autocomplete="off">
+        <span>ml</span>
+      </div>
+      <div class="answerHint" id="answerHint">Type the volume in ml.</div>
+
+      <div class="actions">
+        <button id="checkBtn" class="action" onclick="checkAnswer()">Check Answer</button>
+        <button id="nextBtn" class="action alt hidden" onclick="nextQuestion()">Next →</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+      <div class="explain" id="explain"></div>
+    </div>
+
+    <div class="card diveCard">
+      <div class="diveTitle">Diving Pool</div>
+      <div class="diveStage">
+        <svg class="diveSvg" viewBox="0 0 520 270" aria-label="diving pool">
+          <rect x="0" y="0" width="520" height="270" fill="#dff5ff"/>
+
+          <!-- pool -->
+          <rect x="150" y="150" width="340" height="88" rx="16" fill="#71caf2" stroke="#49afe1" stroke-width="4"/>
+          <path d="M150 186 Q170 178 190 186 T230 186 T270 186 T310 186 T350 186 T390 186 T430 186 T470 186"
+                fill="none" stroke="#b4ecff" stroke-width="3" opacity=".9"/>
+
+          <!-- diving boards -->
+          <line x1="100" y1="70" x2="100" y2="150" stroke="#8b98a6" stroke-width="12"/>
+          <line x1="130" y1="70" x2="130" y2="150" stroke="#8b98a6" stroke-width="12"/>
+          <rect x="95" y="66" width="85" height="12" rx="6" fill="#95a9ba"/>
+
+          <line x1="100" y1="115" x2="100" y2="195" stroke="#8b98a6" stroke-width="12"/>
+          <line x1="130" y1="115" x2="130" y2="195" stroke="#8b98a6" stroke-width="12"/>
+          <rect x="95" y="111" width="85" height="12" rx="6" fill="#95a9ba"/>
+
+          <text x="25" y="60" font-size="18" font-weight="900" fill="#13598e">Player 1</text>
+          <text x="25" y="105" font-size="18" font-weight="900" fill="#13598e">Score:</text>
+          <text x="420" y="62" font-size="20" font-weight="900" fill="#13598e">FINISH ZONE</text>
+
+          <text x="25" y="152" font-size="18" font-weight="900" fill="#b9413d">Player 2</text>
+          <text x="25" y="197" font-size="18" font-weight="900" fill="#b9413d">Score:</text>
+
+          <text id="poolScore1" x="90" y="105" font-size="22" font-weight="900" fill="#13598e">0</text>
+          <text id="poolScore2" x="90" y="197" font-size="22" font-weight="900" fill="#b9413d">0</text>
+
+          <g id="diver1" transform="translate(166 71)">
+            <circle cx="0" cy="-16" r="8" fill="#f3bf94" stroke="#20364b" stroke-width="2"/>
+            <path d="M-3 -21 Q0 -28 5 -21" fill="#2a4156"/>
+            <line x1="0" y1="-8" x2="0" y2="12" stroke="#438fe8" stroke-width="7" stroke-linecap="round"/>
+            <line x1="0" y1="-2" x2="-10" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-2" x2="12" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="12" x2="-8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="12" x2="8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+          </g>
+
+          <g id="diver2" transform="translate(166 116)">
+            <circle cx="0" cy="-16" r="8" fill="#f3bf94" stroke="#20364b" stroke-width="2"/>
+            <path d="M-3 -21 Q0 -28 5 -21" fill="#2a4156"/>
+            <line x1="0" y1="-8" x2="0" y2="12" stroke="#e95a55" stroke-width="7" stroke-linecap="round"/>
+            <line x1="0" y1="-2" x2="-10" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="-2" x2="12" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="12" x2="-8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+            <line x1="0" y1="12" x2="8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+          </g>
+
+          <g id="splash1" opacity="0">
+            <circle cx="0" cy="0" r="6" fill="#fff"/>
+            <circle cx="15" cy="-9" r="4" fill="#fff"/>
+            <circle cx="27" cy="1" r="5" fill="#fff"/>
+            <circle cx="12" cy="12" r="4" fill="#fff"/>
+          </g>
+          <g id="splash2" opacity="0">
+            <circle cx="0" cy="0" r="6" fill="#fff"/>
+            <circle cx="15" cy="-9" r="4" fill="#fff"/>
+            <circle cx="27" cy="1" r="5" fill="#fff"/>
+            <circle cx="12" cy="12" r="4" fill="#fff"/>
+          </g>
+        </svg>
+      </div>
+      <div class="diveNote" id="diveNote">Ready to dive!</div>
+    </div>
+  </div>
+</section>
+
+<section id="results" class="screen">
+  <div class="card results">
+    <div class="trophy">🏆</div>
+    <h2 id="resultTitle">Great Work!</h2>
+    <p id="resultText"></p>
+    <button class="bigbtn" onclick="restart()">Play Again</button>
+    <button class="bigbtn gold" onclick="goHome()">Choose Mode</button>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+const TOTAL=12;
+let mode=1;
+let round=0;
+let currentPlayer=0;
+let scores=[0,0];
+let questions=[];
+let answered=false;
+let soundOn=true;
+let audioCtx=null;
+let difficulty="easy";
+
+function difficultyLabel(){
+  return difficulty==="easy"?"Easy":difficulty==="intermediate"?"Intermediate":"Hard";
+}
+function updateDifficultyUI(){
+  ["easy","intermediate","hard"].forEach(level=>{
+    const id="diff"+level.charAt(0).toUpperCase()+level.slice(1);
+    const btn=document.getElementById(id);
+    if(btn) btn.classList.toggle("active", difficulty===level);
+  });
+  const display=document.getElementById("difficultyDisplay");
+  if(display) display.textContent="★ "+difficultyLabel();
+  const lb=document.getElementById("levelBadge");
+  if(lb) lb.textContent=difficultyLabel();
+}
+function setDifficulty(level){
+  difficulty=level;
+  updateDifficultyUI();
+}
+
+// -------- sound --------
+function initAudio(){
+  if(audioCtx) return;
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(Ctx) audioCtx=new Ctx();
+}
+function tone(freq,dur=.1,type="triangle",vol=.04,delay=0){
+  if(!soundOn) return;
+  initAudio();
+  if(!audioCtx) return;
+  const t=audioCtx.currentTime+delay;
+  const o=audioCtx.createOscillator();
+  const g=audioCtx.createGain();
+  o.type=type;
+  o.frequency.setValueAtTime(freq,t);
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+.01);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t); o.stop(t+dur+.03);
+}
+function correctSound(){tone(660,.08);tone(880,.12,"triangle",.045,.09)}
+function wrongSound(){tone(210,.12,"sawtooth",.045);tone(160,.18,"sawtooth",.035,.11)}
+function diveSound(){tone(340,.07,"square",.03);tone(470,.08,"square",.03,.08);tone(590,.09,"triangle",.035,.16)}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById("soundBtn").textContent=soundOn?"🔊 Sound On":"🔇 Sound Off";
+}
+
+// -------- helpers --------
+function show(id){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function goHome(){show("home")}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function formatNum(n){
+  return Math.abs(n-Math.round(n))<0.0001 ? String(Math.round(n)) : String(Number(n.toFixed(1)));
+}
+function approxEqual(a,b){
+  return Math.abs(Number(a)-Number(b))<0.0001;
+}
+function startGame(m){
+  mode=m;
+  initAudio();
+  if(audioCtx&&audioCtx.state==="suspended") audioCtx.resume();
+  restart();
+}
+function restart(){
+  round=0;
+  currentPlayer=0;
+  scores=[0,0];
+  questions=buildQuestions();
+  document.getElementById("score2").style.visibility=mode===2?"visible":"hidden";
+  document.getElementById("poolScore2").style.visibility=mode===2?"visible":"visible";
+  updateDifficultyUI();
+  show("game");
+  renderQuestion();
+}
+
+// -------- question building --------
+function buildQuestions(){
+  const qs=[];
+  const kinds=["jug","cylinder","syringe","jug","cylinder","syringe","jug","cylinder","syringe","jug","cylinder","syringe"];
+  for(let i=0;i<TOTAL;i++){
+    const kind=kinds[i];
+    if(kind==="jug") qs.push(makeJugQuestion());
+    if(kind==="cylinder") qs.push(makeCylinderQuestion());
+    if(kind==="syringe") qs.push(makeSyringeQuestion());
+  }
+  return shuffle(qs);
+}
+function makeJugQuestion(){
+  let opts, helper;
+  if(difficulty==="easy"){
+    opts=[100,200,300,400,500,600,700,800,900];
+    helper="Each long marking on the beaker represents 100 ml.";
+  }else{
+    opts=[50,100,150,200,250,300,350,400,450];
+    helper=difficulty==="intermediate"
+      ? "Long markings are 100 ml. Short markings are 50 ml."
+      : "";
+  }
+  const a=pick(opts), b=pick(opts.filter(x=>x!==a || difficulty!=="easy"));
+  const total=a+b;
+  return {
+    kind:"jug",
+    badge:"Jug",
+    question:"What is the volume of grape juice in the jug?",
+    answer:total,
+    helper,
+    explain:`The two beakers show ${formatNum(a)} ml and ${formatNum(b)} ml. So the jug contains ${formatNum(total)} ml.`,
+    data:{a,b}
+  };
+}
+function makeCylinderQuestion(){
+  let vals, helper, stepMode;
+  if(difficulty==="easy"){
+    vals=[10,20,30,40,50,60];
+    helper="Each long marking represents 10 ml.";
+    stepMode="10";
+  }else if(difficulty==="intermediate"){
+    vals=[5,10,15,20,25,30,35,40,45,50,55,60];
+    helper="Long markings are 10 ml. Short markings are 5 ml.";
+    stepMode="5";
+  }else{
+    vals=[];
+    for(let i=6;i<=59;i++) vals.push(i);
+    helper="";
+    stepMode="1";
+  }
+  const value=pick(vals);
+  return {
+    kind:"cylinder",
+    badge:"Dispenser",
+    question:"What is the volume of chilli oil in the dispenser?",
+    answer:value,
+    helper,
+    explain:`The dispenser reads ${formatNum(value)} ml.`,
+    data:{value, stepMode}
+  };
+}
+function makeSyringeQuestion(){
+  // Pupils have not learnt decimal volume readings yet:
+  // every answer is a whole number of millilitres.
+  const vals=[1,2,3,4,5,6,7,8,9];
+  let helper="";
+  let stepMode="1";
+
+  if(difficulty==="easy"){
+    helper="Each marking on the syringe represents 1 ml.";
+  }else if(difficulty==="intermediate"){
+    helper="Read the scale carefully. Each marking represents 1 ml.";
+  }else{
+    helper="";
+  }
+
+  const value=pick(vals);
+  return {
+    kind:"syringe",
+    badge:"Syringe",
+    question:"What is the volume of medicine syrup in the syringe?",
+    answer:value,
+    helper,
+    explain:`The syringe contains ${value} ml.`,
+    data:{value, stepMode}
+  };
+}
+
+// -------- SVG builders --------
+function jugSVG(){
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="jug with beakers">
+    <defs>
+      <linearGradient id="jugBody" x1="0" x2="1">
+        <stop offset="0" stop-color="#f3f3f3"/><stop offset="1" stop-color="#d8d8d8"/>
+      </linearGradient>
+      <linearGradient id="juice" x1="0" x2="1">
+        <stop offset="0" stop-color="#8a54b5"/><stop offset="1" stop-color="#7b45a8"/>
+      </linearGradient>
+    </defs>
+    <g transform="translate(12,10)">
+      <path d="M90 18 Q140 10 176 15 Q196 18 198 30 Q184 38 177 63 L177 155 Q176 180 156 196 Q145 205 92 205 Q39 205 28 196 Q8 180 7 155 L7 60 Q16 46 15 31 Q26 20 52 18 Z"
+            fill="url(#jugBody)" stroke="#a8a8a8" stroke-width="3"/>
+      <path d="M21 66 L163 66 L163 156 Q162 175 149 187 Q141 194 92 194 Q43 194 35 187 Q22 175 21 156 Z"
+            fill="url(#juice)" opacity=".92"/>
+      <path d="M27 23 Q-18 30 -17 80 Q-17 126 26 126" fill="none" stroke="#a8a8a8" stroke-width="12" stroke-linecap="round"/>
+      <path d="M31 30 Q-7 36 -7 80 Q-7 118 29 120" fill="none" stroke="#ececec" stroke-width="8" stroke-linecap="round"/>
+      <path d="M172 17 Q192 6 212 12 Q198 19 198 30 Z" fill="#ececec" stroke="#a8a8a8" stroke-width="3"/>
+    </g>
+    <g transform="translate(235,92)">
+      <path d="M0 8 L48 8 L48 0 L92 16 L48 32 L48 24 L0 24 Z" fill="#f04f3d"/>
+    </g>
+  </svg>`;
+}
+function beakerPairSVG(v1,v2){
+  function oneBeaker(x,v,label){
+    const max=1000;
+    const top=28, bottom=186, left=0, right=92;
+    const fillH=(v/max)*(bottom-top);
+    const y=bottom-fillH;
+    let ticks="";
+    for(let m=100;m<=1000;m+=100){
+      const ty=bottom-(m/max)*(bottom-top);
+      ticks+=`<line x1="${right-24}" y1="${ty}" x2="${right}" y2="${ty}" stroke="#222" stroke-width="2.6"/>`;
+      ticks+=`<text x="${right+12}" y="${ty+5}" font-size="16" font-weight="900" fill="#111">${m}</text>`;
+      if(m<1000){
+        const my=bottom-((m+50)/max)*(bottom-top);
+        ticks+=`<line x1="${right-14}" y1="${my}" x2="${right}" y2="${my}" stroke="#c22" stroke-width="2"/>`;
+      }
+    }
+    return `
+      <g transform="translate(${x},12)">
+        <path d="M8 20 L84 20 L80 34 L80 186 Q80 198 68 198 L24 198 Q12 198 12 186 L12 34 Z"
+              fill="#ffffff" stroke="#8b8b8b" stroke-width="3"/>
+        <rect x="13" y="${y}" width="66" height="${fillH}" fill="#8e67b9" opacity=".84"/>
+        <line x1="13" y1="${y}" x2="79" y2="${y}" stroke="#6f4fa0" stroke-width="3"/>
+        ${ticks}
+        <text x="46" y="220" text-anchor="middle" font-size="16" font-weight="900" fill="#0b5a90">${label}</text>
+      </g>`;
+  }
+
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="jug with beakers">
+    <defs>
+      <linearGradient id="jugBody2" x1="0" x2="1">
+        <stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#dddddd"/>
+      </linearGradient>
+      <linearGradient id="juice2" x1="0" x2="1">
+        <stop offset="0" stop-color="#8a54b5"/><stop offset="1" stop-color="#7a46a8"/>
+      </linearGradient>
+    </defs>
+
+    <g transform="translate(8,6)">
+      <path d="M95 14 Q145 6 178 12 Q200 15 205 28 Q188 37 180 60 L180 164 Q179 191 158 209 Q146 218 94 218 Q42 218 30 209 Q9 191 8 164 L8 56 Q18 42 18 28 Q28 16 55 14 Z"
+            fill="url(#jugBody2)" stroke="#8c8c8c" stroke-width="4"/>
+      <path d="M24 76 L166 76 L166 164 Q165 184 151 196 Q143 202 94 202 Q45 202 37 196 Q23 184 24 164 Z"
+            fill="url(#juice2)" opacity=".9"/>
+      <path d="M31 20 Q-12 27 -12 84 Q-12 136 30 136" fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"/>
+      <path d="M36 28 Q2 34 2 84 Q2 128 34 129" fill="none" stroke="#f2f2f2" stroke-width="6" stroke-linecap="round"/>
+      <path d="M179 14 Q198 4 218 10 Q203 18 205 28 Z" fill="#efefef" stroke="#8c8c8c" stroke-width="3"/>
+    </g>
+
+    <g transform="translate(228,98)">
+      <path d="M0 10 L45 10 L45 0 L90 18 L45 36 L45 26 L0 26 Z" fill="#ef4b3f"/>
+    </g>
+
+    ${oneBeaker(340,v1,"Beaker 1")}
+    ${oneBeaker(480,v2,"Beaker 2")}
+  </svg>`;
+}
+
+function cylinderSVG(value,mode){
+  const max=60;
+
+  // Large zoomed-in measuring cylinder only.
+  // Other supporting graphics are removed for clearer reading.
+  const cylX=150, cylY=12, cylW=170, cylH=212;
+  const fillH=(value/max)*cylH;
+  const fillY=cylY + cylH - fillH;
+
+  let ticks="";
+  if(mode==="10"){
+    for(let m=0;m<=60;m+=10){
+      const y=cylY + cylH - (m/max)*cylH;
+      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW+46}" y2="${y}" stroke="#222" stroke-width="4"/>`;
+      if(m<60) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
+    }
+  }else if(mode==="5"){
+    for(let m=0;m<=60;m+=5){
+      const y=cylY + cylH - (m/max)*cylH;
+      const isLong = m%10===0;
+      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW + (isLong?46:28)}" y2="${y}" stroke="${isLong ? "#222" : "#c22"}" stroke-width="${isLong?4:2.6}"/>`;
+      if(m<60 && isLong) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
+    }
+  }else{
+    for(let m=0;m<=60;m+=1){
+      const y=cylY + cylH - (m/max)*cylH;
+      let len=18, sw=2.1, col="#555";
+      if(m%10===0){ len=46; sw=4; col="#222"; }
+      else if(m%5===0){ len=32; sw=2.8; col="#c22"; }
+      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW+len}" y2="${y}" stroke="${col}" stroke-width="${sw}"/>`;
+      if(m<60 && m%10===0) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
+    }
+  }
+
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="measuring cylinder">
+    <g>
+      <path d="M${cylX} ${cylY+10} L${cylX+cylW} ${cylY+10} L${cylX+cylW-8} ${cylY+28} L${cylX+cylW-8} ${cylY+cylH+6} L${cylX+10} ${cylY+cylH+6} L${cylX+10} ${cylY+28} Z"
+            fill="#fbfbfb" stroke="#6f6787" stroke-width="5"/>
+      <rect x="${cylX+10}" y="${fillY}" width="${cylW-18}" height="${fillH}" fill="#f04122" opacity=".96"/>
+      <line x1="${cylX+10}" y1="${fillY}" x2="${cylX+cylW-8}" y2="${fillY}" stroke="#cf3419" stroke-width="4"/>
+      ${ticks}
+      <text x="${cylX+62}" y="${cylY+cylH+36}" font-size="30" font-weight="900" fill="#0b5a90">ml</text>
+    </g>
+  </svg>`;
+}
+
+function syringeSVG(value,mode,showHelper){
+  const max=10;
+  const helper = showHelper ? `<g transform="translate(54,6)">
+      <path d="M0 0 H450 Q474 0 474 22 V58 Q474 80 450 80 H320 L340 106 L286 80 H0 Q-24 80 -24 58 V22 Q-24 0 0 0 Z"
+            fill="#efeaff" stroke="#bcaee8" stroke-width="3"/>
+      <text x="225" y="28" text-anchor="middle" font-size="15" font-weight="900" fill="#523f89">This syringe can measure up to 10 ml.</text>
+      <text x="225" y="52" text-anchor="middle" font-size="15" font-weight="900" fill="#523f89">Each marking represents 1 ml.</text>
+    </g>` : "";
+
+  const sx=220, sy=130, sw=260, sh=54;
+  const fillW=(value/max)*sw;
+
+  let ticks="";
+  if(mode==="1"){
+    for(let m=0;m<=10;m++){
+      const x=sx + (m/10)*sw;
+      ticks += `<line x1="${x}" y1="${sy+sh}" x2="${x}" y2="${sy+sh-34}" stroke="#1f1f1f" stroke-width="3.2"/>`;
+      if(m<10){
+        ticks += `<text x="${x+4}" y="${sy+sh-42}" font-size="22" font-weight="900" fill="#111">${m}</text>`;
+      }
+    }
+  }else{
+    for(let i=0;i<=20;i++){
+      const x=sx + (i/20)*sw;
+      const longTick = i % 2 === 0;
+      const len = longTick ? 34 : 20;
+      const swt = longTick ? 3.2 : 2.1;
+      ticks += `<line x1="${x}" y1="${sy+sh}" x2="${x}" y2="${sy+sh-len}" stroke="#1f1f1f" stroke-width="${swt}"/>`;
+      if(i<20 && longTick){
+        ticks += `<text x="${x+4}" y="${sy+sh-42}" font-size="22" font-weight="900" fill="#111">${i/2}</text>`;
+      }
+    }
+  }
+
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="syringe">
+    ${helper}
+
+    <!-- small context image -->
+    <g transform="translate(18,112)">
+      <rect x="0" y="0" width="165" height="88" rx="12" fill="#fff" stroke="#ad9cd0" stroke-width="3"/>
+      <path d="M10 70 Q40 58 64 68" fill="none" stroke="#999" stroke-width="4"/>
+      <ellipse cx="66" cy="68" rx="16" ry="7" fill="#f4a3c0"/>
+      <g transform="translate(98,36) rotate(-28)">
+        <line x1="-10" y1="0" x2="10" y2="0" stroke="#777" stroke-width="4"/>
+        <rect x="10" y="-8" width="62" height="16" rx="3" fill="#fff" stroke="#777" stroke-width="2.5"/>
+        <rect x="10" y="-7" width="${(value/max)*62}" height="14" rx="2" fill="#e86d9a" opacity=".78"/>
+        <line x1="${10+(value/max)*62}" y1="-12" x2="${10+(value/max)*62}" y2="12" stroke="#666" stroke-width="3"/>
+        <line x1="72" y1="0" x2="86" y2="-6" stroke="#8ec8e5" stroke-width="3"/>
+        <line x1="86" y1="-6" x2="96" y2="-6" stroke="#8ec8e5" stroke-width="1.6"/>
+        <circle cx="98" cy="-6" r="2.2" fill="#f06b8f"/>
+      </g>
+    </g>
+
+    <!-- large clear syringe -->
+    <g>
+      <line x1="${sx-36}" y1="${sy+sh/2}" x2="${sx}" y2="${sy+sh/2}" stroke="#777" stroke-width="6"/>
+      <line x1="${sx-36}" y1="${sy+sh/2-18}" x2="${sx-36}" y2="${sy+sh/2+18}" stroke="#777" stroke-width="5"/>
+
+      <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="10" fill="#f9f9f9" stroke="#666" stroke-width="4"/>
+      <rect x="${sx+2}" y="${sy+3}" width="${fillW}" height="${sh-6}" rx="8" fill="#e86d9a" opacity=".86"/>
+      ${ticks}
+
+      <line x1="${sx+fillW}" y1="${sy-10}" x2="${sx+fillW}" y2="${sy+sh+10}" stroke="#555" stroke-width="6"/>
+
+      <line x1="${sx+sw}" y1="${sy+sh/2}" x2="${sx+sw+28}" y2="${sy+sh/2-10}" stroke="#8ec8e5" stroke-width="6"/>
+      <line x1="${sx+sw+28}" y1="${sy+sh/2-10}" x2="${sx+sw+48}" y2="${sy+sh/2-10}" stroke="#8ec8e5" stroke-width="2"/>
+      <circle cx="${sx+sw+52}" cy="${sy+sh/2-10}" r="4" fill="#f06b8f"/>
+    </g>
+  </svg>`;
+}
+
+function renderMeasureScene(q){
+  if(q.kind==="jug") return beakerPairSVG(q.data.a, q.data.b);
+  if(q.kind==="cylinder") return cylinderSVG(q.data.value, q.data.stepMode);
+  return syringeSVG(q.data.value, q.data.stepMode, difficulty!=="hard");
+}
+
+// -------- diving animation --------
+function resetDive(){
+  const d1=document.getElementById("diver1");
+  const d2=document.getElementById("diver2");
+  d1.getAnimations().forEach(a=>a.cancel());
+  d2.getAnimations().forEach(a=>a.cancel());
+  document.getElementById("splash1").getAnimations().forEach(a=>a.cancel());
+  document.getElementById("splash2").getAnimations().forEach(a=>a.cancel());
+  d1.setAttribute("transform","translate(166 71)");
+  d2.setAttribute("transform","translate(166 116)");
+  document.getElementById("splash1").setAttribute("opacity","0");
+  document.getElementById("splash2").setAttribute("opacity","0");
+  document.getElementById("poolScore1").textContent=scores[0];
+  document.getElementById("poolScore2").textContent=scores[1];
+  document.getElementById("diveNote").textContent="Ready to dive!";
+}
+function successDive(player){
+  diveSound();
+  const diver=document.getElementById(player===0?"diver1":"diver2");
+  const splash=document.getElementById(player===0?"splash1":"splash2");
+  const startY=player===0?71:116;
+  const splashY=198;
+  const splashX=394;
+
+  diver.animate([
+    {transform:`translate(166px, ${startY}px) rotate(0deg)`},
+    {transform:`translate(245px, ${startY-12}px) rotate(35deg)`, offset:.35},
+    {transform:`translate(332px, ${startY+28}px) rotate(105deg)`, offset:.72},
+    {transform:`translate(380px, ${splashY}px) rotate(160deg)`, opacity:0}
+  ],{duration:900,easing:"cubic-bezier(.25,.75,.2,1)",fill:"forwards"});
+  splash.setAttribute("transform",`translate(${splashX} ${splashY+10})`);
+  splash.animate([{opacity:0},{opacity:1, offset:.6},{opacity:0}],{duration:900,easing:"ease-out",fill:"forwards"});
+  document.getElementById("diveNote").textContent=player===0?"🏅 Player 1 makes a great dive!":"🏅 Player 2 makes a great dive!";
+}
+function failDive(player){
+  wrongSound();
+  const diver=document.getElementById(player===0?"diver1":"diver2");
+  const splash=document.getElementById(player===0?"splash1":"splash2");
+  const startY=player===0?71:116;
+  const splashY=player===0?132:177;
+  const splashX=224;
+  diver.animate([
+    {transform:`translate(166px, ${startY}px) rotate(0deg)`},
+    {transform:`translate(192px, ${startY+8}px) rotate(15deg)`, offset:.45},
+    {transform:`translate(214px, ${startY+26}px) rotate(90deg)`, opacity:0}
+  ],{duration:650,easing:"ease-in",fill:"forwards"});
+  splash.setAttribute("transform",`translate(${splashX} ${splashY})`);
+  splash.animate([{opacity:0},{opacity:1, offset:.65},{opacity:0}],{duration:650,easing:"ease-out",fill:"forwards"});
+  document.getElementById("diveNote").textContent=player===0?"💦 Oops! Player 1 flops.":"💦 Oops! Player 2 flops.";
+}
+
+// -------- game --------
+function renderQuestion(){
+  answered=false;
+  const q=questions[round];
+  document.getElementById("round").textContent=`${round+1} / ${TOTAL}`;
+  document.getElementById("bar").style.width=`${(round/TOTAL)*100}%`;
+  document.getElementById("score1").textContent=`Player 1: ${scores[0]}`;
+  document.getElementById("score2").textContent=`Player 2: ${scores[1]}`;
+  document.getElementById("typeBadge").textContent=q.badge;
+  document.getElementById("levelBadge").textContent=difficultyLabel();
+  document.getElementById("question").textContent=q.question;
+  document.getElementById("measureScene").innerHTML=renderMeasureScene(q);
+  document.getElementById("helperBubble").textContent=q.helper || "Look carefully at the markings. Read where the plunger edge lines up.";
+  document.getElementById("helperBubble").style.visibility=q.helper ? "visible" : (difficulty==="hard" ? "hidden" : "visible");
+  document.getElementById("feedback").textContent="";
+  document.getElementById("explain").textContent="";
+  document.getElementById("answerHint").textContent="Type the whole number of millilitres.";
+
+  const input=document.getElementById("answerInput");
+  input.value="";
+  input.disabled=false;
+  input.className="answerInput";
+  input.focus();
+
+  document.getElementById("checkBtn").disabled=false;
+  document.getElementById("nextBtn").classList.add("hidden");
+
+  const turn=document.getElementById("turnBanner");
+  if(mode===2){
+    turn.textContent=currentPlayer===0?"🔵 Player 1's Turn":"🔴 Player 2's Turn";
+    turn.className="badge turn "+(currentPlayer===0?"p1":"p2");
+  }else{
+    turn.textContent="👤 Your Turn";
+    turn.className="badge turn p1";
+  }
+
+  resetDive();
+}
+function checkAnswer(){
+  if(answered) return;
+  const q=questions[round];
+  const input=document.getElementById("answerInput");
+  const raw=input.value.trim();
+  if(raw===""){
+    const fb=document.getElementById("feedback");
+    fb.textContent="⚠️ Fill in the blank first.";
+    fb.style.color="#b36f14";
+    return;
+  }
+  answered=true;
+  document.getElementById("checkBtn").disabled=true;
+  input.disabled=true;
+
+  const value=Number(raw);
+  const ok=!Number.isNaN(value) && approxEqual(value, q.answer);
+  const fb=document.getElementById("feedback");
+  const ex=document.getElementById("explain");
+  const player=mode===2?currentPlayer:0;
+
+  if(ok){
+    correctSound();
+    scores[player]++;
+    input.classList.add("correct");
+    fb.textContent="✅ Correct!";
+    fb.style.color="#14884b";
+    ex.textContent=q.explain;
+    successDive(player);
+  }else{
+    input.classList.add("wrong");
+    fb.textContent="❌ Not quite.";
+    fb.style.color="#b43b3b";
+    ex.textContent=`${q.explain} The correct answer is ${formatNum(q.answer)} ml.`;
+    failDive(player);
+  }
+
+  document.getElementById("score1").textContent=`Player 1: ${scores[0]}`;
+  document.getElementById("score2").textContent=`Player 2: ${scores[1]}`;
+  document.getElementById("poolScore1").textContent=scores[0];
+  document.getElementById("poolScore2").textContent=scores[1];
+  document.getElementById("nextBtn").classList.remove("hidden");
+}
+function nextQuestion(){
+  round++;
+  if(round>=TOTAL){finish();return}
+  if(mode===2) currentPlayer=currentPlayer===0?1:0;
+  renderQuestion();
+}
+function finish(){
+  document.getElementById("bar").style.width="100%";
+  show("results");
+  if(mode===1){
+    const s=scores[0];
+    document.getElementById("resultTitle").textContent=s>=10?"Diving Volume Champion!":s>=7?"Great Diving!":"Keep Practising!";
+    document.getElementById("resultText").innerHTML=
+      `You answered <b>${s} out of ${TOTAL}</b> questions correctly at <b>${difficultyLabel()}</b> level.<br>`+
+      (s>=10?"Excellent work reading volume in millilitres!":s>=7?"Good job. You are getting confident with ml readings.":"Try again and look carefully at the markings.");
+  }else{
+    const a=scores[0], b=scores[1];
+    document.getElementById("resultTitle").textContent=a===b?"It's a Draw!":`Player ${a>b?1:2} Wins!`;
+    document.getElementById("resultText").innerHTML=
+      `Difficulty: <b>${difficultyLabel()}</b><br>Player 1: <b>${a}</b><br>Player 2: <b>${b}</b><br><br>Players took turns reading volumes and making dives.`;
+  }
+}
+
+// Enter key
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("game").classList.contains("active")) return;
+  if(e.key==="Enter"){
+    e.preventDefault();
+    if(answered) nextQuestion(); else checkAnswer();
+  }
+});
+
+// preview art and init
+document.getElementById("previewArt").innerHTML=`
+<svg viewBox="0 0 560 220" style="width:100%;height:100%">
+  <rect x="150" y="126" width="340" height="72" rx="16" fill="#71caf2" stroke="#49afe1" stroke-width="4"/>
+  <path d="M150 160 Q170 152 190 160 T230 160 T270 160 T310 160 T350 160 T390 160 T430 160 T470 160" fill="none" stroke="#b4ecff" stroke-width="3"/>
+  <line x1="105" y1="66" x2="105" y2="126" stroke="#8b98a6" stroke-width="11"/>
+  <line x1="130" y1="66" x2="130" y2="126" stroke="#8b98a6" stroke-width="11"/>
+  <rect x="100" y="62" width="82" height="11" rx="5" fill="#95a9ba"/>
+  <g transform="translate(168 67)">
+    <circle cx="0" cy="-16" r="8" fill="#f3bf94" stroke="#20364b" stroke-width="2"/>
+    <line x1="0" y1="-8" x2="0" y2="12" stroke="#438fe8" stroke-width="7" stroke-linecap="round"/>
+    <line x1="0" y1="-2" x2="-10" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+    <line x1="0" y1="-2" x2="12" y2="4" stroke="#f3bf94" stroke-width="5" stroke-linecap="round"/>
+    <line x1="0" y1="12" x2="-8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+    <line x1="0" y1="12" x2="8" y2="25" stroke="#20364b" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <text x="358" y="54" text-anchor="middle" font-size="24" font-weight="900" fill="#0c5c92">Correct → dive into the pool!</text>
+</svg>`;
+updateDifficultyUI();
+</script>
+</body>
+</html>
