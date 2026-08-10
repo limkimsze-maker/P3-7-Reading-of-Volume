@@ -226,7 +226,7 @@ main{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column}
     <div class="card preview">
       <h3>Question types</h3>
       <ul>
-        <li>Find the volume of grape juice in a jug</li>
+        <li>Find the volume of orange drink in a measuring jug</li>
         <li>Read the volume in a dispenser or measuring cylinder</li>
         <li>Read the volume in a syringe</li>
         <li>Different levels give simpler or trickier markings</li>
@@ -261,7 +261,7 @@ main{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column}
         <div class="badge turn p1" id="turnBanner">👤 Your Turn</div>
       </div>
 
-      <div id="question">What is the volume of grape juice in the jug?</div>
+      <div id="question">What is the total volume of orange drink in the measuring jug?</div>
 
       <div class="measureWrap">
         <div class="helperBubble" id="helperBubble">Helper note here.</div>
@@ -484,7 +484,7 @@ function makeJugQuestion(){
   return {
     kind:"jug",
     badge:"Jug",
-    question:"What is the volume of grape juice in the jug?",
+    question:"What is the total volume of orange drink in the measuring jug?",
     answer:total,
     helper,
     explain:`The two beakers show ${formatNum(a)} ml and ${formatNum(b)} ml. So the jug contains ${formatNum(total)} ml.`,
@@ -933,6 +933,7 @@ document.getElementById("previewArt").innerHTML=`
 </svg>`;
 updateDifficultyUI();
 </script>
+<script src="https://limkimsze-maker.github.io/P3-Length-Mass-and-Volume-Sports-Fiesta-/sports-fiesta-original-questions-v1.js?v=20260810a" data-practice="7"></script>
 <script src="https://limkimsze-maker.github.io/P3-Length-Mass-and-Volume-Sports-Fiesta-/sports-fiesta-medal-hook-v4.js?v=20260810d" data-practice="7" data-sport="Diving"></script>
 </body>
 </html>
