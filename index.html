@@ -510,11 +510,11 @@ function makeCylinderQuestion(){
   const value=pick(vals);
   return {
     kind:"cylinder",
-    badge:"Dispenser",
-    question:"What is the volume of chilli oil in the dispenser?",
+    badge:"Cylinder",
+    question:"What is the volume of blue sports drink in the measuring cylinder?",
     answer:value,
     helper,
-    explain:`The dispenser reads ${formatNum(value)} ml.`,
+    explain:`The measuring cylinder reads ${formatNum(value)} ml.`,
     data:{value, stepMode}
   };
 }
@@ -537,7 +537,7 @@ function makeSyringeQuestion(){
   return {
     kind:"syringe",
     badge:"Syringe",
-    question:"What is the volume of medicine syrup in the syringe?",
+    question:"What is the volume of coloured water in the syringe?",
     answer:value,
     helper,
     explain:`The syringe contains ${value} ml.`,
@@ -571,174 +571,98 @@ function jugSVG(){
   </svg>`;
 }
 function beakerPairSVG(v1,v2){
-  function oneBeaker(x,v,label){
-    const max=1000;
-    const top=28, bottom=186, left=0, right=92;
+  function oneCup(x,v,label){
+    const max=1000, top=34, bottom=190, right=118;
     const fillH=(v/max)*(bottom-top);
     const y=bottom-fillH;
     let ticks="";
-    for(let m=100;m<=1000;m+=100){
+    for(let m=50;m<=1000;m+=50){
       const ty=bottom-(m/max)*(bottom-top);
-      ticks+=`<line x1="${right-24}" y1="${ty}" x2="${right}" y2="${ty}" stroke="#222" stroke-width="2.6"/>`;
-      ticks+=`<text x="${right+12}" y="${ty+5}" font-size="16" font-weight="900" fill="#111">${m}</text>`;
-      if(m<1000){
-        const my=bottom-((m+50)/max)*(bottom-top);
-        ticks+=`<line x1="${right-14}" y1="${my}" x2="${right}" y2="${my}" stroke="#c22" stroke-width="2"/>`;
-      }
+      const major=m%100===0;
+      ticks+=`<line x1="${right-(major?24:14)}" y1="${ty}" x2="${right}" y2="${ty}" stroke="${major?'#173b5e':'#68859d'}" stroke-width="${major?2.4:1.4}"/>`;
+      if(major) ticks+=`<text x="${right+7}" y="${ty+4}" font-size="12" font-weight="900" fill="#173b5e">${m}</text>`;
     }
-    return `
-      <g transform="translate(${x},12)">
-        <path d="M8 20 L84 20 L80 34 L80 186 Q80 198 68 198 L24 198 Q12 198 12 186 L12 34 Z"
-              fill="#ffffff" stroke="#8b8b8b" stroke-width="3"/>
-        <rect x="13" y="${y}" width="66" height="${fillH}" fill="#8e67b9" opacity=".84"/>
-        <line x1="13" y1="${y}" x2="79" y2="${y}" stroke="#6f4fa0" stroke-width="3"/>
-        ${ticks}
-        <text x="46" y="220" text-anchor="middle" font-size="16" font-weight="900" fill="#0b5a90">${label}</text>
-      </g>`;
+    return `<g transform="translate(${x},10)">
+      <path d="M24 22 H112 L104 190 Q103 204 88 204 H42 Q27 204 26 190 Z" fill="#f8fdff" stroke="#176ca5" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M34 28 H100" stroke="#176ca5" stroke-width="7" stroke-linecap="round"/>
+      <path d="M28 ${y} H102 L98 190 Q97 196 88 196 H43 Q34 196 33 190 Z" fill="#ffbf4a" opacity=".82"/>
+      <line x1="31" y1="${y}" x2="101" y2="${y}" stroke="#e68a12" stroke-width="3"/>
+      ${ticks}
+      <rect x="30" y="210" width="84" height="22" rx="11" fill="#e9f6ff"/>
+      <text x="72" y="225" text-anchor="middle" font-size="13" font-weight="900" fill="#0b5a90">${label}</text>
+      <text x="72" y="50" text-anchor="middle" font-size="10" font-weight="900" fill="#176ca5">ml</text>
+    </g>`;
   }
-
-  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="jug with beakers">
-    <defs>
-      <linearGradient id="jugBody2" x1="0" x2="1">
-        <stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#dddddd"/>
-      </linearGradient>
-      <linearGradient id="juice2" x1="0" x2="1">
-        <stop offset="0" stop-color="#8a54b5"/><stop offset="1" stop-color="#7a46a8"/>
-      </linearGradient>
-    </defs>
-
-    <g transform="translate(8,6)">
-      <path d="M95 14 Q145 6 178 12 Q200 15 205 28 Q188 37 180 60 L180 164 Q179 191 158 209 Q146 218 94 218 Q42 218 30 209 Q9 191 8 164 L8 56 Q18 42 18 28 Q28 16 55 14 Z"
-            fill="url(#jugBody2)" stroke="#8c8c8c" stroke-width="4"/>
-      <path d="M24 76 L166 76 L166 164 Q165 184 151 196 Q143 202 94 202 Q45 202 37 196 Q23 184 24 164 Z"
-            fill="url(#juice2)" opacity=".9"/>
-      <path d="M31 20 Q-12 27 -12 84 Q-12 136 30 136" fill="none" stroke="#8c8c8c" stroke-width="10" stroke-linecap="round"/>
-      <path d="M36 28 Q2 34 2 84 Q2 128 34 129" fill="none" stroke="#f2f2f2" stroke-width="6" stroke-linecap="round"/>
-      <path d="M179 14 Q198 4 218 10 Q203 18 205 28 Z" fill="#efefef" stroke="#8c8c8c" stroke-width="3"/>
+  return `<svg class="measureSvg" viewBox="0 0 680 250" aria-label="two original measuring cups and a sports jug">
+    <defs><linearGradient id="sfJug" x1="0" x2="1"><stop offset="0" stop-color="#e9f8ff"/><stop offset="1" stop-color="#cfefff"/></linearGradient></defs>
+    <g transform="translate(18,28)">
+      <path d="M48 30 H180 L166 176 Q164 198 142 202 H70 Q48 198 46 176 Z" fill="url(#sfJug)" stroke="#176ca5" stroke-width="5"/>
+      <path d="M54 112 H172 L166 176 Q164 190 142 194 H70 Q54 191 52 176 Z" fill="#ffbf4a" opacity=".72"/>
+      <path d="M176 47 Q224 52 221 103 Q219 153 171 158" fill="none" stroke="#176ca5" stroke-width="12" stroke-linecap="round"/>
+      <path d="M180 47 L208 34" stroke="#176ca5" stroke-width="8" stroke-linecap="round"/>
+      <rect x="67" y="45" width="77" height="24" rx="12" fill="#176ca5"/>
+      <text x="106" y="62" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">SPORTS MIX</text>
     </g>
-
-    <g transform="translate(228,98)">
-      <path d="M0 10 L45 10 L45 0 L90 18 L45 36 L45 26 L0 26 Z" fill="#ef4b3f"/>
-    </g>
-
-    ${oneBeaker(340,v1,"Beaker 1")}
-    ${oneBeaker(480,v2,"Beaker 2")}
+    <g transform="translate(258,105)"><path d="M0 9 H47 V0 L88 18 L47 36 V27 H0 Z" fill="#31a67a"/></g>
+    ${oneCup(365,v1,'Cup A')}
+    ${oneCup(515,v2,'Cup B')}
   </svg>`;
 }
 
 function cylinderSVG(value,mode){
   const max=60;
-
-  // Large zoomed-in measuring cylinder only.
-  // Other supporting graphics are removed for clearer reading.
-  const cylX=150, cylY=12, cylW=170, cylH=212;
-  const fillH=(value/max)*cylH;
-  const fillY=cylY + cylH - fillH;
-
+  const x=226, y0=22, w=126, h=182;
+  const fillH=(value/max)*h, fillY=y0+h-fillH;
+  const step=Number(mode)||10;
   let ticks="";
-  if(mode==="10"){
-    for(let m=0;m<=60;m+=10){
-      const y=cylY + cylH - (m/max)*cylH;
-      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW+46}" y2="${y}" stroke="#222" stroke-width="4"/>`;
-      if(m<60) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
-    }
-  }else if(mode==="5"){
-    for(let m=0;m<=60;m+=5){
-      const y=cylY + cylH - (m/max)*cylH;
-      const isLong = m%10===0;
-      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW + (isLong?46:28)}" y2="${y}" stroke="${isLong ? "#222" : "#c22"}" stroke-width="${isLong?4:2.6}"/>`;
-      if(m<60 && isLong) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
-    }
-  }else{
-    for(let m=0;m<=60;m+=1){
-      const y=cylY + cylH - (m/max)*cylH;
-      let len=18, sw=2.1, col="#555";
-      if(m%10===0){ len=46; sw=4; col="#222"; }
-      else if(m%5===0){ len=32; sw=2.8; col="#c22"; }
-      ticks += `<line x1="${cylX+cylW}" y1="${y}" x2="${cylX+cylW+len}" y2="${y}" stroke="${col}" stroke-width="${sw}"/>`;
-      if(m<60 && m%10===0) ticks += `<text x="${cylX+cylW+58}" y="${y+8}" font-size="28" font-weight="900" fill="#111">${m} ml</text>`;
-    }
+  const tickStep=step===1?1:step===5?5:10;
+  for(let m=0;m<=60;m+=tickStep){
+    const y=y0+h-(m/max)*h;
+    const major=m%10===0;
+    const mid=m%5===0;
+    const len=major?42:mid?28:16;
+    ticks+=`<line x1="${x+w}" y1="${y}" x2="${x+w+len}" y2="${y}" stroke="${major?'#173b5e':'#6d8497'}" stroke-width="${major?3.2:1.5}"/>`;
+    if(major && m<60) ticks+=`<text x="${x+w+50}" y="${y+6}" font-size="20" font-weight="900" fill="#173b5e">${m}</text>`;
   }
-
-  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="measuring cylinder">
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="original Sports Lab measuring cylinder">
     <g>
-      <path d="M${cylX} ${cylY+10} L${cylX+cylW} ${cylY+10} L${cylX+cylW-8} ${cylY+28} L${cylX+cylW-8} ${cylY+cylH+6} L${cylX+10} ${cylY+cylH+6} L${cylX+10} ${cylY+28} Z"
-            fill="#fbfbfb" stroke="#6f6787" stroke-width="5"/>
-      <rect x="${cylX+10}" y="${fillY}" width="${cylW-18}" height="${fillH}" fill="#f04122" opacity=".96"/>
-      <line x1="${cylX+10}" y1="${fillY}" x2="${cylX+cylW-8}" y2="${fillY}" stroke="#cf3419" stroke-width="4"/>
+      <rect x="188" y="9" width="230" height="28" rx="14" fill="#176ca5"/>
+      <text x="303" y="28" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">SPORTS LAB • 60 ml</text>
+      <path d="M${x} ${y0} H${x+w} L${x+w-8} ${y0+h} H${x+8} Z" fill="#f8fdff" stroke="#176ca5" stroke-width="4"/>
+      <path d="M${x+8} ${fillY} H${x+w-8} L${x+w-14} ${y0+h-4} H${x+14} Z" fill="#62c6e8" opacity=".88"/>
+      <line x1="${x+8}" y1="${fillY}" x2="${x+w-8}" y2="${fillY}" stroke="#1689bd" stroke-width="3"/>
       ${ticks}
-      <text x="${cylX+62}" y="${cylY+cylH+36}" font-size="30" font-weight="900" fill="#0b5a90">ml</text>
+      <path d="M${x+22} ${y0+h+4} H${x+w-22} L${x+w+5} ${y0+h+22} H${x-5} Z" fill="#dcefff" stroke="#176ca5" stroke-width="4"/>
+      <text x="${x+w/2}" y="232" text-anchor="middle" font-size="18" font-weight="900" fill="#0b5a90">ml</text>
     </g>
   </svg>`;
 }
 
 function syringeSVG(value,mode,showHelper){
   const max=10;
-  const helper = showHelper ? `<g transform="translate(54,6)">
-      <path d="M0 0 H450 Q474 0 474 22 V58 Q474 80 450 80 H320 L340 106 L286 80 H0 Q-24 80 -24 58 V22 Q-24 0 0 0 Z"
-            fill="#efeaff" stroke="#bcaee8" stroke-width="3"/>
-      <text x="225" y="28" text-anchor="middle" font-size="15" font-weight="900" fill="#523f89">This syringe can measure up to 10 ml.</text>
-      <text x="225" y="52" text-anchor="middle" font-size="15" font-weight="900" fill="#523f89">Each marking represents 1 ml.</text>
-    </g>` : "";
-
-  const sx=220, sy=130, sw=260, sh=54;
-  const fillW=(value/max)*sw;
-
+  const x=160, y=112, w=330, h=66;
+  const fillW=(value/max)*w;
   let ticks="";
-  if(mode==="1"){
-    for(let m=0;m<=10;m++){
-      const x=sx + (m/10)*sw;
-      ticks += `<line x1="${x}" y1="${sy+sh}" x2="${x}" y2="${sy+sh-34}" stroke="#1f1f1f" stroke-width="3.2"/>`;
-      if(m<10){
-        ticks += `<text x="${x+4}" y="${sy+sh-42}" font-size="22" font-weight="900" fill="#111">${m}</text>`;
-      }
-    }
-  }else{
-    for(let i=0;i<=20;i++){
-      const x=sx + (i/20)*sw;
-      const longTick = i % 2 === 0;
-      const len = longTick ? 34 : 20;
-      const swt = longTick ? 3.2 : 2.1;
-      ticks += `<line x1="${x}" y1="${sy+sh}" x2="${x}" y2="${sy+sh-len}" stroke="#1f1f1f" stroke-width="${swt}"/>`;
-      if(i<20 && longTick){
-        ticks += `<text x="${x+4}" y="${sy+sh-42}" font-size="22" font-weight="900" fill="#111">${i/2}</text>`;
-      }
-    }
+  for(let m=0;m<=10;m++){
+    const tx=x+(m/max)*w;
+    ticks+=`<line x1="${tx}" y1="${y}" x2="${tx}" y2="${y+(m%5===0?25:17)}" stroke="#273f57" stroke-width="${m%5===0?3:2}"/>`;
+    if(m<10) ticks+=`<text x="${tx+5}" y="${y+40}" font-size="15" font-weight="900" fill="#273f57">${m}</text>`;
   }
-
-  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="syringe">
+  const helper=showHelper?`<g><rect x="155" y="28" width="340" height="48" rx="24" fill="#f1ebff" stroke="#bcaee8" stroke-width="3"/><text x="325" y="48" text-anchor="middle" font-size="14" font-weight="900" fill="#523f89">Needleless 10 ml syringe</text><text x="325" y="67" text-anchor="middle" font-size="13" font-weight="900" fill="#523f89">Each numbered interval is 1 ml.</text></g>`:'';
+  return `<svg class="measureSvg" viewBox="0 0 640 240" aria-label="original needleless 10 ml syringe">
     ${helper}
-
-    <!-- small context image -->
-    <g transform="translate(18,112)">
-      <rect x="0" y="0" width="165" height="88" rx="12" fill="#fff" stroke="#ad9cd0" stroke-width="3"/>
-      <path d="M10 70 Q40 58 64 68" fill="none" stroke="#999" stroke-width="4"/>
-      <ellipse cx="66" cy="68" rx="16" ry="7" fill="#f4a3c0"/>
-      <g transform="translate(98,36) rotate(-28)">
-        <line x1="-10" y1="0" x2="10" y2="0" stroke="#777" stroke-width="4"/>
-        <rect x="10" y="-8" width="62" height="16" rx="3" fill="#fff" stroke="#777" stroke-width="2.5"/>
-        <rect x="10" y="-7" width="${(value/max)*62}" height="14" rx="2" fill="#e86d9a" opacity=".78"/>
-        <line x1="${10+(value/max)*62}" y1="-12" x2="${10+(value/max)*62}" y2="12" stroke="#666" stroke-width="3"/>
-        <line x1="72" y1="0" x2="86" y2="-6" stroke="#8ec8e5" stroke-width="3"/>
-        <line x1="86" y1="-6" x2="96" y2="-6" stroke="#8ec8e5" stroke-width="1.6"/>
-        <circle cx="98" cy="-6" r="2.2" fill="#f06b8f"/>
-      </g>
-    </g>
-
-    <!-- large clear syringe -->
     <g>
-      <line x1="${sx-36}" y1="${sy+sh/2}" x2="${sx}" y2="${sy+sh/2}" stroke="#777" stroke-width="6"/>
-      <line x1="${sx-36}" y1="${sy+sh/2-18}" x2="${sx-36}" y2="${sy+sh/2+18}" stroke="#777" stroke-width="5"/>
-
-      <rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="10" fill="#f9f9f9" stroke="#666" stroke-width="4"/>
-      <rect x="${sx+2}" y="${sy+3}" width="${fillW}" height="${sh-6}" rx="8" fill="#e86d9a" opacity=".86"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#f8fdff" stroke="#6b52a3" stroke-width="5"/>
+      <rect x="${x+4}" y="${y+5}" width="${Math.max(0,fillW-6)}" height="${h-10}" rx="16" fill="#65d1c2" opacity=".9"/>
+      <line x1="${x+fillW}" y1="${y-9}" x2="${x+fillW}" y2="${y+h+9}" stroke="#4d397d" stroke-width="6"/>
       ${ticks}
-
-      <line x1="${sx+fillW}" y1="${sy-10}" x2="${sx+fillW}" y2="${sy+sh+10}" stroke="#555" stroke-width="6"/>
-
-      <line x1="${sx+sw}" y1="${sy+sh/2}" x2="${sx+sw+28}" y2="${sy+sh/2-10}" stroke="#8ec8e5" stroke-width="6"/>
-      <line x1="${sx+sw+28}" y1="${sy+sh/2-10}" x2="${sx+sw+48}" y2="${sy+sh/2-10}" stroke="#8ec8e5" stroke-width="2"/>
-      <circle cx="${sx+sw+52}" cy="${sy+sh/2-10}" r="4" fill="#f06b8f"/>
+      <line x1="${x-48}" y1="${y+h/2}" x2="${x}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="8" stroke-linecap="round"/>
+      <rect x="${x-73}" y="${y+8}" width="25" height="50" rx="8" fill="#d9cff4" stroke="#6b52a3" stroke-width="4"/>
+      <line x1="${x+w}" y1="${y+h/2}" x2="${x+w+34}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="8" stroke-linecap="round"/>
+      <path d="M${x+w+34} ${y+h/2-9} L${x+w+62} ${y+h/2} L${x+w+34} ${y+h/2+9} Z" fill="#d9cff4" stroke="#6b52a3" stroke-width="3"/>
+      <rect x="${x+118}" y="${y+h+18}" width="96" height="24" rx="12" fill="#6b52a3"/>
+      <text x="${x+166}" y="${y+h+35}" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">SPORTS LAB</text>
+      <text x="${x+w+72}" y="${y+h/2+6}" font-size="16" font-weight="900" fill="#0b5a90">ml</text>
     </g>
   </svg>`;
 }
