@@ -188,7 +188,7 @@ main{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column}
 <div class="app">
 <header>
   <h1>🤿 Diving Volume in Millilitres Challenge</h1>
-  <div class="sub">Read volume in ml • jug • dispenser • syringe<br>1 Player or 2 Players • 3 Levels</div>
+  <div class="sub">Read volume in ml • jug • measuring cylinder • syringe<br>1 Player or 2 Players • 3 Levels</div>
 </header>
 
 <main>
@@ -227,7 +227,7 @@ main{flex:1;min-height:0;padding:10px;display:flex;flex-direction:column}
       <h3>Question types</h3>
       <ul>
         <li>Find the volume of orange drink in a measuring jug</li>
-        <li>Read the volume in a dispenser or measuring cylinder</li>
+        <li>Read the volume in a measuring cylinder</li>
         <li>Read the volume in a syringe</li>
         <li>Different levels give simpler or trickier markings</li>
       </ul>
@@ -656,10 +656,10 @@ function syringeSVG(value,mode,showHelper){
       <rect x="${x+4}" y="${y+5}" width="${Math.max(0,fillW-6)}" height="${h-10}" rx="16" fill="#65d1c2" opacity=".9"/>
       <line x1="${x+fillW}" y1="${y-9}" x2="${x+fillW}" y2="${y+h+9}" stroke="#4d397d" stroke-width="6"/>
       ${ticks}
-      <line x1="${x-48}" y1="${y+h/2}" x2="${x}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="8" stroke-linecap="round"/>
-      <rect x="${x-73}" y="${y+8}" width="25" height="50" rx="8" fill="#d9cff4" stroke="#6b52a3" stroke-width="4"/>
-      <line x1="${x+w}" y1="${y+h/2}" x2="${x+w+34}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="8" stroke-linecap="round"/>
-      <path d="M${x+w+34} ${y+h/2-9} L${x+w+62} ${y+h/2} L${x+w+34} ${y+h/2+9} Z" fill="#d9cff4" stroke="#6b52a3" stroke-width="3"/>
+      <line x1="${x-34}" y1="${y+h/2}" x2="${x}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="8" stroke-linecap="round"/>
+      <path d="M${x-34} ${y+h/2-9} L${x-62} ${y+h/2} L${x-34} ${y+h/2+9} Z" fill="#d9cff4" stroke="#6b52a3" stroke-width="3"/>
+      <line x1="${x+fillW}" y1="${y+h/2}" x2="${x+w+48}" y2="${y+h/2}" stroke="#6b52a3" stroke-width="6" stroke-linecap="round"/>
+      <rect x="${x+w+48}" y="${y+8}" width="25" height="50" rx="8" fill="#d9cff4" stroke="#6b52a3" stroke-width="4"/>
       <rect x="${x+118}" y="${y+h+18}" width="96" height="24" rx="12" fill="#6b52a3"/>
       <text x="${x+166}" y="${y+h+35}" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">SPORTS LAB</text>
       <text x="${x+w+72}" y="${y+h/2+6}" font-size="16" font-weight="900" fill="#0b5a90">ml</text>
