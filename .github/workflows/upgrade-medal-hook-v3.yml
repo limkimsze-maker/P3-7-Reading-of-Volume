@@ -1,8 +1,0 @@
-name: Legacy V3 Medal Hook Disabled
-on:
-  workflow_dispatch:
-jobs:
-  disabled:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "Legacy v3 hook is disabled. Sports Fiesta v4 is the active shared hook."
