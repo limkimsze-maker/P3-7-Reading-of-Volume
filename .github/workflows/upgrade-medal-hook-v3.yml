@@ -1,31 +1,8 @@
-name: Upgrade Medal Hook V3
+name: Legacy V3 Medal Hook Disabled
 on:
-  push:
-    branches: [main]
-permissions:
-  contents: write
+  workflow_dispatch:
 jobs:
-  upgrade:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Switch to v3 ceremony bridge
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-          old=s
-          s=s.replace('sports-fiesta-medal-hook.js?v=20260810b','sports-fiesta-medal-hook-v3.js?v=20260810c')
-          s=s.replace('sports-fiesta-medal-hook.js','sports-fiesta-medal-hook-v3.js?v=20260810c')
-          p.write_text(s,encoding='utf-8')
-          print('changed',s!=old)
-          PY
-      - name: Commit
-        run: |
-          if git diff --quiet; then exit 0; fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add index.html
-          git commit -m "Use exact Sports Fiesta preview ceremony v3"
-          git push
+      - run: echo "Legacy v3 hook is disabled. Sports Fiesta v4 is the active shared hook."
