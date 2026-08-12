@@ -1,0 +1,35 @@
+name: Add Back to Fiesta Hub
+on:
+  push:
+    paths:
+      - '.github/workflows/add-back-to-hub.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add shared hub back button
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os,json,base64,time,urllib.request,urllib.error
+          repo=os.environ['GITHUB_REPOSITORY']; token=os.environ['GH_TOKEN']; url=f'https://api.github.com/repos/{repo}/contents/index.html'
+          h={'Authorization':f'Bearer {token}','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+          tag='<script src="https://limkimsze-maker.github.io/P3-Length-Mass-and-Volume-Sports-Fiesta-/sports-fiesta-back-to-hub-v1.js?v=20260812a"></script>'
+          for _ in range(12):
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers=h)) as r:m=json.load(r)
+              s=base64.b64decode(m['content']).decode()
+              if 'sports-fiesta-back-to-hub-v1.js' in s: raise SystemExit(0)
+              s2=s.replace('</body>',tag+'\n</body>')
+              if s2==s: raise SystemExit('No </body> tag found')
+              p=json.dumps({'message':'Add Back to Fiesta Hub button','content':base64.b64encode(s2.encode()).decode(),'sha':m['sha'],'branch':'main'}).encode()
+              with urllib.request.urlopen(urllib.request.Request(url,data=p,headers={**h,'Content-Type':'application/json'},method='PUT')) as r:print(json.load(r)['commit']['sha'])
+              raise SystemExit(0)
+            except urllib.error.HTTPError as e:
+              if e.code in (409,422):time.sleep(1.5);continue
+              raise
+          raise SystemExit(1)
+          PY
