@@ -1,0 +1,29 @@
+name: Add random question layer
+on:
+  push:
+    paths:
+      - '.github/workflows/add-random-questions-layer.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add shared random question script
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text()
+          tag='<script src="https://limkimsze-maker.github.io/P3-Length-Mass-and-Volume-Sports-Fiesta-/sports-fiesta-random-questions-v1.js?v=20260812a" data-practice="7"></script>'
+          if 'sports-fiesta-random-questions-v1.js' not in s:
+              s=s.replace('</body>',tag+'\n</body>')
+              p.write_text(s)
+          PY
+      - name: Commit change
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add reasonable random questions"
+          git push
