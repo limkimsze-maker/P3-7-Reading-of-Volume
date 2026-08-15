@@ -731,14 +731,32 @@ function renderMeasureScene(q){
 function resetDive(){
   const d1=document.getElementById("diver1");
   const d2=document.getElementById("diver2");
-  d1.getAnimations().forEach(a=>a.cancel());
-  d2.getAnimations().forEach(a=>a.cancel());
-  document.getElementById("splash1").getAnimations().forEach(a=>a.cancel());
-  document.getElementById("splash2").getAnimations().forEach(a=>a.cancel());
+  const s1=document.getElementById("splash1");
+  const s2=document.getElementById("splash2");
+
+  // Cancel any previous dive/flop animation and explicitly restore the
+  // SVG state. Some browsers can retain the final opacity from a
+  // fill:"forwards" Web Animation unless opacity is reset directly.
+  [d1,d2,s1,s2].forEach(el=>el.getAnimations().forEach(a=>a.cancel()));
+
+  d1.style.opacity="1";
+  d2.style.opacity="1";
+  d1.setAttribute("opacity","1");
+  d2.setAttribute("opacity","1");
+  d1.style.transform="";
+  d2.style.transform="";
   d1.setAttribute("transform","translate(166 71)");
   d2.setAttribute("transform","translate(166 116)");
-  document.getElementById("splash1").setAttribute("opacity","0");
-  document.getElementById("splash2").setAttribute("opacity","0");
+
+  const showP2=mode===2;
+  d1.style.visibility="visible";
+  d2.style.visibility=showP2?"visible":"hidden";
+
+  s1.style.opacity="0";
+  s2.style.opacity="0";
+  s1.setAttribute("opacity","0");
+  s2.setAttribute("opacity","0");
+
   document.getElementById("poolScore1").textContent=scores[0];
   document.getElementById("poolScore2").textContent=scores[1];
   document.getElementById("diveNote").textContent="Ready to dive!";
@@ -746,6 +764,8 @@ function resetDive(){
 function successDive(player){
   diveSound();
   const diver=document.getElementById(player===0?"diver1":"diver2");
+  diver.style.opacity="1";
+  diver.setAttribute("opacity","1");
   const splash=document.getElementById(player===0?"splash1":"splash2");
   const startY=player===0?71:116;
   const splashY=198;
@@ -764,6 +784,8 @@ function successDive(player){
 function failDive(player){
   wrongSound();
   const diver=document.getElementById(player===0?"diver1":"diver2");
+  diver.style.opacity="1";
+  diver.setAttribute("opacity","1");
   const splash=document.getElementById(player===0?"splash1":"splash2");
   const startY=player===0?71:116;
   const splashY=player===0?132:177;
