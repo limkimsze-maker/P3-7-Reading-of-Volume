@@ -1,0 +1,47 @@
+name: Normalize Sports Fiesta awards
+permissions:
+  contents: write
+on:
+  push:
+    branches: [main]
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install medal-only award hook
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os,re
+          repo=os.environ['REPO']
+          mapping={
+          'limkimsze-maker/P3-3-Recall-of-Mass':(3,'Bowling'),
+          'limkimsze-maker/P3-4-Mass-Reading':(4,'Weightlifting'),
+          'limkimsze-maker/P3-5-Mass-Conversion':(5,'Shot Put'),
+          'limkimsze-maker/P3-6-Recall-Volume':(6,'Swimming'),
+          'limkimsze-maker/P3-7-Reading-of-Volume':(7,'Diving'),
+          'limkimsze-maker/P3-8-measuring-volumes-in-litres-and-millimetres':(8,'Water Polo'),
+          'limkimsze-maker/P3-9-measuring-volumes-in-litres-and-mililitres':(9,'Sailing'),
+          'limkimsze-maker/P3-10-Recall-Word-Problems':(10,'Triathlon'),
+          'limkimsze-maker/P3-11-Length-Mass-and-Volume-Word-Problems':(11,'Torch Relay')}
+          n,sport=mapping[repo]
+          p=Path('index.html'); s=p.read_text(encoding='utf-8')
+          s=re.sub(r'\s*<script[^>]+src=["\'][^"\']*sports-fiesta-(?:medal-hook-v4|awards-v1)\.js[^"\']*["\'][^>]*></script>\s*','\n',s,flags=re.I)
+          tag=f'<script src="https://limkimsze-maker.github.io/P3-Length-Mass-and-Volume-Sports-Fiesta-/sports-fiesta-awards-v1.js?v=20260819b" data-practice="{n}" data-sport="{sport}"></script>'
+          i=s.lower().rfind('</body>')
+          if i<0: raise SystemExit('No </body> found')
+          s=s[:i]+tag+'\n'+s[i:]
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit award hook only
+        run: |
+          if git diff --quiet -- index.html; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Use medal-only Sports Fiesta award hook"
+          git push
